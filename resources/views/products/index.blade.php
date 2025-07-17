@@ -8,14 +8,56 @@
             </a>
         </div>
 
+        <!-- Search Form -->
+        <div class="mb-6">
+            <form action="{{ route('product.index') }}" method="GET" class="flex items-center w-full md:w-2/3 lg:w-1/2">
+                <input type="text" name="search" placeholder="Search by name or description..."
+                    value="{{ $search ?? '' }}"
+                    class="w-full px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-300">
+                <button type="submit"
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-r-lg transition duration-300">Search</button>
+                @if ($search)
+                    <a href="{{ route('product.index') }}"
+                        class="ml-4 text-sm text-gray-600 hover:text-gray-800 whitespace-nowrap">Clear Search</a>
+                @endif
+            </form>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white">
                 <thead class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                     <tr>
                         <th class="py-3 px-6 text-left">ID</th>
-                        <th class="py-3 px-6 text-left">Name</th>
-                        <th class="py-3 px-6 text-center">Quantity</th>
-                        <th class="py-3 px-6 text-center">Price</th>
+                        <th class="py-3 px-6 text-left">
+                            {{-- Sort by prd_name --}}
+                            <a href="{{ route('product.index', array_merge(request()->query(), ['sort_by' => 'prd_name', 'sort_dir' => $sortBy == 'prd_name' && $sortDir == 'asc' ? 'desc' : 'asc'])) }}"
+                                class="flex items-center">
+                                Name
+                                @if ($sortBy == 'prd_name')
+                                    <span class="ml-2">{{ $sortDir == 'asc' ? '▲' : '▼' }}</span>
+                                @endif
+                            </a>
+                        </th>
+                        <th class="py-3 px-6 text-center">
+                            {{-- Sort by prd_quantity --}}
+                            <a href="{{ route('product.index', array_merge(request()->query(), ['sort_by' => 'prd_quantity', 'sort_dir' => $sortBy == 'prd_quantity' && $sortDir == 'asc' ? 'desc' : 'asc'])) }}"
+                                class="flex items-center justify-center">
+                                Quantity
+                                @if ($sortBy == 'prd_quantity')
+                                    <span class="ml-2">{{ $sortDir == 'asc' ? '▲' : '▼' }}</span>
+                                @endif
+                            </a>
+                        </th>
+                        <th class="py-3 px-6 text-center">
+                            {{-- Sort by prd_price --}}
+                            <a href="{{ route('product.index', array_merge(request()->query(), ['sort_by' => 'prd_price', 'sort_dir' => $sortBy == 'prd_price' && $sortDir == 'asc' ? 'desc' : 'asc'])) }}"
+                                class="flex items-center justify-center">
+                                Price
+                                @if ($sortBy == 'prd_price')
+                                    <span class="ml-2">{{ $sortDir == 'asc' ? '▲' : '▼' }}</span>
+                                @endif
+                            </a>
+                        </th>
                         <th class="py-3 px-6 text-center">Actions</th>
                     </tr>
                 </thead>

@@ -10,11 +10,39 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::latest()->paginate(10);
+        // Request input parameters from view and
+        // set sort column and direction
+        $search = $request->input('search');
+        $sortBy = $request->input('sort_by', 'created_at');
+        $sortDir = $request->input('sort_dir', 'desc');
 
-        return view('products.index', compact('products'));
+        // Set sortable columns
+        $validSortColumns = ['prd_name', 'prd_quantity', 'prd_price', 'created_at'];
+        if (! in_array($sortBy, $validSortColumns)) {
+            $sortBy = 'created_at';
+        }
+
+        // Query according to search parameters
+        // Currently searches for prd_name and prd_description
+        $query = Product::query();
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('prd_name', 'like', "%{$search}%")
+                    ->orWhere('prd_description', 'like', "%{$search}%");
+            });
+        }
+
+        // Sort query and add pagination
+        $query->orderBy($sortBy, $sortDir);
+        $products = $query->paginate(10);
+
+        // Pass search and sort parameters to pagination
+        $products->appends($request->all());
+
+        // Pass all the data to the view
+        return view('products.index', compact('products', 'search', 'sortBy', 'sortDir'));
     }
 
     /**
@@ -79,6 +107,7 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
+
         return to_route('product.index');
     }
 }
